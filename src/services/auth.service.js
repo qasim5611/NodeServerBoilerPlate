@@ -81,7 +81,7 @@ exports.FindUserById = async function (query) {
 
 
 
-exports.addNewuser = async function (query, res) {
+exports.AddNewuser = async function (query, res) {
    const addUser = new AuthSchema({
      name: query.newUser.name,
      email: query.newUser.email,

@@ -5,7 +5,7 @@ const passport = require("passport");
 
 const User = require("./src/routes/user.route");
 const Auth = require("./src/routes/auth.route");
-
+const Product = require("./src/routes/product.route");
 
 const app = express();
 
@@ -33,6 +33,8 @@ require("./src/config/passport")(passport);
 app.use("/User", User);
 // SignIn SignUp Routes
 app.use("/Auth", Auth);
+// product table
+app.use("/Product", Product);
 
 
 const port = process.env.PORT || 6000;

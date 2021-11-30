@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const passport = require("passport");
 
 var UserController = require("../controllers/user.controller");
 
@@ -9,8 +10,8 @@ var UserController = require("../controllers/user.controller");
 router.post("/adduser", UserController.adduser);
  // @route   GET /readuser/     // All
   // @desc    Read All user
-  // @access  Public
-router.get("/readuser", UserController.readuser);
+  // @access  Punblic
+router.post("/readuser", UserController.readuser);
  // @route   GET /readuser/     // All
   // @desc    Read Specific user
   // @access  Public

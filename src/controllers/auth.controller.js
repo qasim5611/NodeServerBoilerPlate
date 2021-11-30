@@ -42,38 +42,14 @@ exports.register = async function (req, res, next) {
             password: req.body.password,
           };
 
-          // bcrypt.genSalt(10, (err, salt) => {
-          //   bcrypt.hash(newUser.password, salt, (err, hash) => {
-          //     if (err) throw err;
-          //     newUser.password = hash;
-            
-          //   });
-          // });
+          const salt = await bcrypt.genSalt(10);
+          newUser.password = await bcrypt.hash(newUser.password, salt);
 
-          bcrypt.hash(password, 10, function (err, hash) {
-            if (err) {
-              throw err;
-            }
-            newUser.password = hash;
-            // Do whatever you like with the hash
-          });
-        // const myencppass = async function hashPassword(userpassword) {
-        //   const password = userpassword;
-        //   const saltRounds = 10;
-
-        //   const hashedPassword = await new Promise((resolve, reject) => {
-        //     bcrypt.hash(password, saltRounds, function (err, hash) {
-        //       if (err) reject(err);
-        //       resolve(hash);
-        //     });
-        //   });
-
-        //   return hashedPassword;
-        // };
+          console.log( 'bycrypt pass' , newUser.password);
+          console.log(newUser.password);
 
 
-
-            var isAdded = await AuthService.addNewuser({ newUser });
+            var isAdded = await AuthService.AddNewuser({ newUser });
             if (isAdded == true) {
               return res
                 .status(200)
@@ -105,39 +81,79 @@ exports.login = async function (req, res, next) {
   let useremail = req.body.email;
   let userpassword = req.body.password;
 
-  try {
-    // var page = req.params.page ? req.params.page : 1;
-    // var limit = req.params.limit ? req.params.limit : 1;
-    var userscheck = await AuthService.CheckifEmailFind({ useremail });
-    if (userscheck) {
-      // Check Password
-      // bcrypt.compare(password, userpassword).then((isMatch) => {
-      //   if (isMatch) {
-      //     // User Matched
-      //     const payload = { id: userscheck.id, name: userscheck.name }; // Create JWT Payload
+   try {
+          // var page = req.params.page ? req.params.page : 1;
+          // var limit = req.params.limit ? req.params.limit : 1;
+          const userscheck = await AuthService.CheckifEmailFind({ useremail });
+          console.log("userscheck", userscheck);   
+          
+          if (!userscheck){
+              return res
+                .status(200)
+                .json({ error: "Email Not Found! Got to Register" });
+          }
 
-      //     // Sign Token
-      //     jwt.sign(
-      //       payload,
-      //       keys.secretOrKey,
-      //       { expiresIn: 3600 },
-      //       (err, token) => {
-      //         res.json({
-      //           success: true,
-      //           token: "Bearer " + token,
-      //         });
-      //       }
-      //     );
-      //   } else {
-      //     errors.password = "Password incorrect";
-      //     return res.status(400).json(errors);
-      //   }
-      // });
-    } else {
-    return res
-        .status(200)
-        .json({ error: "Email Not Found! Got to Register" });
-    }
+
+           let dbPass = userscheck[0].password;
+           // Check Password
+           let isMatch = await bcrypt.compare(userpassword, dbPass);
+           //  bcrypt.compare(userpassword, dbpassword);
+           if (isMatch) {
+             // User Matched
+             const payload = {
+               id: userscheck[0].id,
+               name: userscheck[0].name,
+             }; // Create JWT Payload
+
+             // Sign Token
+             jwt.sign(
+               payload,
+               keys.secretOrKey,
+               { expiresIn: 3600 },
+               (err, token) => {
+                 res.json({
+                   success: true,
+                   token: "Bearer " + token,
+                 });
+               }
+             );
+           } else {
+             errors.password = "Password incorrect";
+             return res.status(400).json(errors);
+           }
+            // if (userscheck == true) {
+            //   let dbPass = userscheck[0].password;
+            //   // Check Password
+            //   let isMatch = await bcrypt.compare(userpassword, dbPass);
+            //   //  bcrypt.compare(userpassword, dbpassword);
+            //   if (isMatch) {
+            //     // User Matched
+            //     const payload = {
+            //       id: userscheck[0].id,
+            //       name: userscheck[0].name,
+            //     }; // Create JWT Payload
+
+            //     // Sign Token
+            //     jwt.sign(
+            //       payload,
+            //       keys.secretOrKey,
+            //       { expiresIn: 3600 },
+            //       (err, token) => {
+            //         res.json({
+            //           success: true,
+            //           token: "Bearer " + token,
+            //         });
+            //       }
+            //     );
+            //   } else {
+            //     errors.password = "Password incorrect";
+            //     return res.status(400).json(errors);
+            //   }
+            // } else if (userscheck == false) {
+            //   return res
+            //     .status(200)
+            //     .json({ error: "Email Not Found! Got to Register" });
+            // }
   } catch (e) {
     return res
       .status(400)

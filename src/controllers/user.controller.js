@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const keys = require("./../config/keys");
 const passport = require("passport");
 const UserService = require("../services/user.service");
+const ProductService = require("../services/product.service");
+
 // Load Input Validation
 const validateUserInput = require("../validation/register");
 const validateUpdatedInput = require("../validation/validUpdateInput");
@@ -85,7 +87,14 @@ exports.readuserByid = async function (req, res, next) {
      let userid = req.body.id;
      var userscheck = await UserService.FindUserById({ userid });
          if (userscheck) {
-            return res.status(200).json({ msg: "User founded" , message: userscheck });
+
+            var productcheck = await ProductService.FindProductByUserId({ userid });
+
+            if (!productcheck) {
+              return res.status(400).json({ msg: "Product Not Found For this User id" });
+            }
+
+            return res.status(200).json({ msg: "Product founded" , message: productcheck });
          } 
          else {
             return res.status(400).json({ error: "User Not founded"  });
