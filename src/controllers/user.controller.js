@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("./../config/keys");
 const passport = require("passport");
+const redis = require("redis");
+
 const UserService = require("../services/user.service");
 const ProductService = require("../services/product.service");
 

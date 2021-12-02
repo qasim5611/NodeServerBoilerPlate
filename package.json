@@ -1,21 +1,25 @@
 {
-  "name": "server",
+  "name": "caching-nodejs",
   "version": "1.0.0",
-  "description": "nodejsBoilerPlate",
-  "main": "app.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
-  "author": "qasim",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.0.13",
+    "mongoose": "^6.0.14",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
+    "redis": "^3.0.2",
+    "response-time": "^2.3.2",
     "validator": "^13.7.0"
   }
 }

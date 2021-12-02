@@ -4,6 +4,17 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const passport = require("passport");
+const redis = require("redis");
+// const responseTime = require("response-time");
+const { promisify } = require("util");
+const client = redis.createClient({
+  host: "127.0.0.1",
+  port: 6379,
+});
+
+const GET_ASYNC = promisify(client.get).bind(client);
+const SET_ASYNC = promisify(client.set).bind(client);
+
 // const ProductService = require("../services/user.service");
 const ProductService = require("../services/product.service");
 
@@ -12,6 +23,10 @@ const validateProductInput = require("../validation/validateProduct");
 const validateUpdatedInput = require("../validation/validUpdateInput");
 
 const validateUserIdField = require("../validation/useridFiels");
+
+
+
+
 
 
 exports.createproduct = async function (req, res, next) {
@@ -93,6 +108,8 @@ exports.readuser = async function (req, res, next) {
 
 exports.getproductbyid = async function (req, res, next) {
   try {
+
+
     let { id } = req.body;
     const { errors, isValid } = validateUserIdField(req.body);
     if (!isValid) {
@@ -101,15 +118,32 @@ exports.getproductbyid = async function (req, res, next) {
     }
 
     let productid = req.body.id;
-    var productcheck = await ProductService.FindProductById({ productid });
-    if (productcheck) {
-      return res.status(200).json({ msg: "Product founded against id", message: productcheck });
+    var respone = await ProductService.FindProductById({ productid });
+
+    if (respone) {
+      const saveResult = await SET_ASYNC(
+        "id",
+        JSON.stringify(respone),
+        "EX",
+        50
+      );
+       console.log("new data cached", saveResult);
+
+      return res.json(saveResult);
     } else {
       return res.status(400).json({ error: "Product Not founded" });
     }
-  } catch (e) {
+  } 
+  catch (e) {
     return res.status(400).json({ status: 400, message: e.message });
   }
+
+
+
+
+
+
+
 };
 
 
