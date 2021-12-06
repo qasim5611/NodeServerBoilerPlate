@@ -3,18 +3,9 @@ var router = express.Router();
 const passport = require("passport");
 
 var ProductController = require("../controllers/product.controller");
+// const cleanCache = require("../middleware/cleanCache");
 
-const redis = require('redis')
-const responseTime = require('response-time')
-const { promisify } = require('util')
-const client = redis.createClient({
-  host: "127.0.0.1",
-  port: 6379,
-});
-
-const GET_ASYNC = promisify(client.get).bind(client);
-const SET_ASYNC = promisify(client.set).bind(client);
-
+const cleanCache = require("./../middleware/cleanCache");
 
 // app.use(responseTime());
 // client.on("error", (error) => {
@@ -38,36 +29,11 @@ router.get("/deleteproduct", ProductController.deleteproduct);
 //   // @access  Public
 
 // Cache middleware
- async function cache(req, res, next) {
-
-  try{
-       const reply = await GET_ASYNC("id");
-         if (reply) {
-           console.log("using cached data");
-           res.send(JSON.parse(reply));
-           return;
-         } else {
-           next();
-         }
-
-  }
-  catch(e){
-    return res.status(400).json({ status: 400, message: e.message });
-  }
-
-}
 
 
 
 
-
-
-
-
-
-
-
-router.get("/getproductbyid", cache, ProductController.getproductbyid);
+router.get("/getproductbyid", cleanCache ,  ProductController.getproductbyid);
 
 
 // router.get("/testproductbyid", cache );

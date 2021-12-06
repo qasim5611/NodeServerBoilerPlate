@@ -12,6 +12,8 @@ const User = require("./src/routes/user.route");
 const Auth = require("./src/routes/auth.route");
 const Product = require("./src/routes/product.route");
 
+require("./src/config/cache");
+
 const app = express();
 app.use(responseTime());
 // Body parser middleware
@@ -44,35 +46,6 @@ app.use("/Auth", Auth);
 app.use("/Product", Product);
 
 
-
-const client = redis.createClient({
-  host: "127.0.0.1",
-  port: 6379,
-});
-const GET_ASYNC = promisify(client.get).bind(client);
-const SET_ASYNC = promisify(client.set).bind(client);
-
-app.get("/rockets", async (req, res, next) => {
-  try {
-    const reply = await GET_ASYNC("rockets");
-    if (reply) {
-      console.log("using cached data");
-      res.send(JSON.parse(reply));
-      return;
-    }
-    const respone = await axios.get("https://api.spacexdata.com/v3/rockets");
-    const saveResult = await SET_ASYNC(
-      "rockets",
-      JSON.stringify(respone.data),
-      "EX",
-      50
-    );
-    console.log("new data cached", saveResult);
-    res.send(respone.data);
-  } catch (error) {
-    res.send(error.message);
-  }
-});
 
 // app.get('/rockets/:rocket_id', async (req, res, next) => {
 //   try {

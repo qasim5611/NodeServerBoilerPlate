@@ -4,16 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const passport = require("passport");
-const redis = require("redis");
-// const responseTime = require("response-time");
-const { promisify } = require("util");
-const client = redis.createClient({
-  host: "127.0.0.1",
-  port: 6379,
-});
 
-const GET_ASYNC = promisify(client.get).bind(client);
-const SET_ASYNC = promisify(client.set).bind(client);
 
 // const ProductService = require("../services/user.service");
 const ProductService = require("../services/product.service");
@@ -23,6 +14,7 @@ const validateProductInput = require("../validation/validateProduct");
 const validateUpdatedInput = require("../validation/validUpdateInput");
 
 const validateUserIdField = require("../validation/useridFiels");
+
 
 
 
@@ -120,27 +112,16 @@ exports.getproductbyid = async function (req, res, next) {
     let productid = req.body.id;
     var respone = await ProductService.FindProductById({ productid });
 
-    if (respone) {
-      const saveResult = await SET_ASYNC(
-        "id",
-        JSON.stringify(respone),
-        "EX",
-        50
-      );
-       console.log("new data cached", saveResult);
+   
 
-      return res.json(saveResult);
-    } else {
-      return res.status(400).json({ error: "Product Not founded" });
-    }
+
+      return res.json(respone);
+   
   } 
   catch (e) {
     return res.status(400).json({ status: 400, message: e.message });
+    
   }
-
-
-
-
 
 
 

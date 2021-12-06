@@ -1,7 +1,7 @@
 var ProductSchema = require("../models/product.model");
 
 var UserSchema = require("../models/user.model");
-
+const { clearHash } = require("./../config/cache");
 
 exports.CheckifUserExistAlready = async function (query) {
   try {
@@ -29,7 +29,7 @@ exports.CheckifIDAvailable = async function (query) {
     var ObjectId = require("mongodb").ObjectId;
     var id = query.prodid;
     var o_id = new ObjectId(id);
-    const prodtest = await ProductSchema.find({ _id: o_id });
+    const prodtest = await ProductSchema.find({ _id: o_id }).cache({key: o_id});
     console.log("is user is find?", prodtest);
     console.log("is user is find?", prodtest);
     let len = prodtest.length;
@@ -41,6 +41,7 @@ exports.CheckifIDAvailable = async function (query) {
   } catch (error) {
     console.log(error);
   }
+  // clearHash(req.body.id);
 };
 
 exports.FindProductById = async function (query) {
@@ -48,7 +49,7 @@ exports.FindProductById = async function (query) {
     let id = query.productid;
     console.log(id);
     console.log(id);
-    const prodtest = await ProductSchema.find().where("_id").equals(id);
+    const prodtest = await ProductSchema.find().where("_id").equals(id).cache({Key: id});
     // let usertest = await ProductSchema.findOne({ mail });
     console.log("is product is find?", prodtest);
     let len = prodtest.length;
@@ -60,6 +61,8 @@ exports.FindProductById = async function (query) {
   } catch (error) {
     console.log(error);
   }
+
+    // clearHash(req.body.id);
 };
 
 
@@ -184,4 +187,6 @@ exports.UpdateUserRecord = async function (id, query) {
   } catch (error) {
     console.log(error);
   }
+
+
 };
